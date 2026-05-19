@@ -11,14 +11,8 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import java.time.Duration;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BackendApiClient {
 
@@ -33,14 +27,14 @@ public class BackendApiClient {
     }
 
     /**
-     * 회의실 목록을 조회합니다.
+     * 사무실 목록을 조회합니다.
      * 
      * @param lcCd 지역 코드
      * @param offmId 건물 ID
-     * @return 회의실 목록
+     * @return 사무실 목록
      */
     public ListVO<OfficeDto> findOffices(String lcCd, String offmId) {
-        logger.info("회의실 목록 조회 시작 - 지역코드: {}, 건물ID: {}", lcCd, offmId);
+        logger.info("사무실 목록 조회 시작 - 지역코드: {}, 건물ID: {}", lcCd, offmId);
         
         try {
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
@@ -51,29 +45,31 @@ public class BackendApiClient {
             ListVO<OfficeDto> response = restClient.post()
                     .uri("/com/smartofc/mtgTablet/selectOffmList.do")
                     .header("Referer", referer)
+                    .header("x-emp-no", UserContext.getEmpNo())
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(form)
                     .retrieve()
                     .body(new org.springframework.core.ParameterizedTypeReference<ListVO<OfficeDto>>() {});
 
-            logger.info("회의실 목록 조회 성공 - 건물 수: {}", 
+            logger.info("사무실 목록 조회 성공 - 건물 수: {}", 
                 response != null && response.getRows() != null ? response.getRows().size() : 0);
                 
             return response;
             
         } catch (HttpClientErrorException e) {
-            logger.error("회의실 목록 조회 실패 - HTTP Client Error: {}", e.getMessage());
-            throw new BackendApiException("회의실 목록 조회에 실패했습니다: " + e.getMessage(), e);
+            logger.error("사무실 목록 조회 실패 - HTTP Client Error: {}", e.getMessage());
+            throw new BackendApiException("사무실 목록 조회에 실패했습니다: " + e.getMessage(), e);
         } catch (HttpServerErrorException e) {
-            logger.error("회의실 목록 조회 실패 - HTTP Server Error: {}", e.getMessage());
-            throw new BackendApiException("회의실 목록 조회에 실패했습니다: " + e.getMessage(), e);
+            logger.error("사무실 목록 조회 실패 - HTTP Server Error: {}", e.getMessage());
+            throw new BackendApiException("사무실 목록 조회에 실패했습니다: " + e.getMessage(), e);
         } catch (ResourceAccessException e) {
-            logger.error("회의실 목록 조회 실패 - Network Error: {}", e.getMessage());
-            throw new BackendApiException("회의실 목록 조회에 실패했습니다: 네트워크 문제가 발생했습니다.", e);
+            logger.error("사무실 목록 조회 실패 - Network Error: {}", e.getMessage());
+            throw new BackendApiException("사무실 목록 조회에 실패했습니다: 네트워크 문제가 발생했습니다.", e);
         } catch (Exception e) {
-            logger.error("회의실 목록 조회 실패 - Unexpected Error: {}", e.getMessage());
-            throw new BackendApiException("회의실 목록 조회에 실패했습니다: 알 수 없는 오류가 발생했습니다.", e);
+            logger.error("사무실 목록 조회 실패 - Unexpected Error: {}", e.getMessage());
+            throw new BackendApiException("사무실 목록 조회에 실패했습니다: 알 수 없는 오류가 발생했습니다.", e);
         }
+    }
     }
 
     /**

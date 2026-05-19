@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
+import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 
 import java.time.Duration;
 
@@ -16,6 +17,7 @@ public class BackendApiConfig {
     public RestClient restClient(BackendApiProperties properties) {
         return RestClient.builder()
                 .baseUrl(properties.getBaseUrl())
+                .requestFactory(new OkHttp3ClientHttpRequestFactory())
                 .build();
     }
 
