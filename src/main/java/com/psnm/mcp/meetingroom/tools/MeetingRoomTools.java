@@ -12,11 +12,26 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 @Component
 public class MeetingRoomTools {
 
     private final BackendApiClient backendApiClient;
+    private static final Logger auditLogger = Logger.getLogger("audit");
+
+    static {
+        try {
+            FileHandler fileHandler = new FileHandler("audit.log", true);
+            fileHandler.setFormatter(new SimpleFormatter());
+            auditLogger.addHandler(fileHandler);
+            auditLogger.setUseParentHandlers(false);
+        } catch (Exception e) {
+            // 로깅 실패 시 아무것도 하지 않음 (필수 요소 아님)
+        }
+    }
 
     public MeetingRoomTools(BackendApiClient backendApiClient) {
         this.backendApiClient = backendApiClient;
@@ -53,6 +68,10 @@ public class MeetingRoomTools {
             @NotBlank(message = "예약 목적은 필수입니다.")
             String purpose) {
         
+        // audit 로깅
+        auditLogger.info(String.format("[%s] [%s] [create_reservation] [meetingRoomId: %s, startDate: %s, startTime: %s, endTime: %s, purpose: %s]", 
+            LocalDate.now(), UserContext.getEmpNo(), meetingRoomId, startDate, startTime, endTime, purpose));
+        
         // validation은 Tool 레벨에서만 처리
         try {
             // 실제 예약 생성 호출은 BackendApiClient를 통해
@@ -68,15 +87,27 @@ public class MeetingRoomTools {
      * 회의실 예약을 취소합니다.
      * 
      * @param reservationId 예약 ID
+     * @param psnetEventId 그룹웨어 이벤트 ID
      * @return 예약 취소 결과
      */
     public CancelReservationResponse cancelReservation(
             @Valid
             @NotBlank(message = "예약 ID는 필수입니다.")
-            String reservationId) {
+            String reservationId,
+            
+            @Valid
+            String psnetEventId) {
+        
+        // audit 로깅
+        auditLogger.info(String.format("[%s] [%s] [cancel_reservation] [reservationId: %s, psnetEventId: %s]", 
+            LocalDate.now(), UserContext.getEmpNo(), reservationId, psnetEventId));
         
         // validation은 Tool 레벨에서만 처리
         try {
+            // 예약자 본인 검증
+            // 실제 구현에서는 ReservationDto를 가져와서 rsvctmId와 UserContext.getEmpNo() 비교
+            // 현재는 더미 구현
+            
             // 실제 예약 취소 호출은 BackendApiClient를 통해
             return new CancelReservationResponse("예약이 성공적으로 취소되었습니다.");
             
@@ -107,6 +138,10 @@ public class MeetingRoomTools {
             @NotBlank(message = "조회 종료 시간은 필수입니다.")
             String endTime) {
         
+        // audit 로깅
+        auditLogger.info(String.format("[%s] [%s] [find_available_rooms] [startDate: %s, startTime: %s, endTime: %s]", 
+            LocalDate.now(), UserContext.getEmpNo(), startDate, startTime, endTime));
+        
         // validation은 Tool 레벨에서만 처리
         try {
             // 실제 회의실 조회 호출은 BackendApiClient를 통해
@@ -125,6 +160,10 @@ public class MeetingRoomTools {
      */
     public List<OfficeDto> getMyReservations() {
         
+        // audit 로깅
+        auditLogger.info(String.format("[%s] [%s] [get_my_reservations]", 
+            LocalDate.now(), UserContext.getEmpNo()));
+        
         // validation은 Tool 레벨에서만 처리
         try {
             // 실제 예약 목록 조회 호출은 BackendApiClient를 통해
@@ -133,6 +172,34 @@ public class MeetingRoomTools {
         } catch (Exception e) {
             // 예외는 Service 계층에서 처리
             throw new RuntimeException("내 예약 조회 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 사무실 목록을 조회합니다.
+     * 
+     * @param lcCd 지역 코드
+     * @param offmId 건물 ID
+     * @return 사무실 목록
+     */
+    public List<OfficeDto> listOffices(
+            @Valid
+            String lcCd,
+            @Valid
+            String offmId) {
+        
+        // audit 로깅
+        auditLogger.info(String.format("[%s] [%s] [list_offices] [lcCd: %s, offmId: %s]", 
+            LocalDate.now(), UserContext.getEmpNo(), lcCd, offmId));
+        
+        // validation은 Tool 레벨에서만 처리
+        try {
+            // 실제 사무실 목록 조회 호출은 BackendApiClient를 통해
+            return List.of(); // 실제 구현에서는 API에서 데이터 반환
+            
+        } catch (Exception e) {
+            // 예외는 Service 계층에서 처리
+            throw new RuntimeException("사무실 목록 조회 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
     }
 
