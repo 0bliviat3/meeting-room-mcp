@@ -9,6 +9,8 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,9 +43,9 @@ public class BackendApiClient {
         logger.info("회의실 목록 조회 시작 - 지역코드: {}, 건물ID: {}", lcCd, offmId);
         
         try {
-            Map<String, String> form = new HashMap<>();
-            if (lcCd != null) form.put("lcCd", lcCd);
-            if (offmId != null) form.put("offmId", offmId);
+            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            if (lcCd != null) form.add("lcCd", lcCd);
+            if (offmId != null) form.add("offmId", offmId);
 
             // API 호출
             ListVO<OfficeDto> response = restClient.post()
@@ -87,11 +89,11 @@ public class BackendApiClient {
             startDate, startTime, endTime);
         
         try {
-            Map<String, String> form = new HashMap<>();
-            form.put("startDate", startDate);
-            form.put("startTime", startTime);
-            form.put("endTime", endTime);
-            form.put("whereType", "available");
+            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            form.add("dt", startDate);
+            form.add("bgnTime", startTime);
+            form.add("endTime", endTime);
+            form.add("whereType", "available");
 
             // API 호출
             ListVO<OfficeDto> response = restClient.post()
@@ -131,13 +133,13 @@ public class BackendApiClient {
         logger.info("내 예약 목록 조회 시작");
         
         try {
-            Map<String, String> form = new HashMap<>();
-            form.put("rsvctmId", UserContext.getEmpNo()); // 실제 구현 시 UserContext에서 가져오기
-            form.put("scope", "mine");
+            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            form.add("rsvctmId", UserContext.getEmpNo()); // 실제 구현 시 UserContext에서 가져오기
+            form.add("scope", "mine");
 
             // API 호출
             ListVO<OfficeDto> response = restClient.post()
-                    .uri("/com/smartofc/mtgTablet/selectResveList.do")
+                    .uri("/com/smartofc/mtgTabletResve/selectResveList.do")
                     .header("Referer", referer)
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(form)
@@ -180,21 +182,25 @@ public class BackendApiClient {
             meetingRoomId, startDate, startTime, endTime);
         
         try {
-            Map<String, String> form = new HashMap<>();
-            form.put("mtgRmId", meetingRoomId);
-            form.put("startDate", startDate);
-            form.put("startTime", startTime);
-            form.put("endTime", endTime);
-            form.put("purpose", purpose);
-            form.put("confmAt", "Y");
-            form.put("secretAt", "N");
-            form.put("resveSttusCd", "STT001");
-            form.put("day", "");
-            form.put("reptitUnitCd", "");
+            MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
+            form.add("mtgrmId", meetingRoomId);
+            form.add("dt", startDate);
+            form.add("bgnTime", startTime);
+            form.add("endTime", endTime);
+            form.add("mtgSj", purpose);
+            form.add("rsvctmId", UserContext.getEmpNo());
+            form.add("lastUpdusrId", UserContext.getEmpNo());
+            form.add("atdrnQty", "1");
+            form.add("atdrnUserList", "[]");
+            form.add("confmAt", "Y");
+            form.add("secretAt", "N");
+            form.add("resveSttusCd", "STT001");
+            form.add("day", "[]");
+            form.add("reptitUnitCd", "");
 
             // API 호출
             ResultVO response = restClient.post()
-                    .uri("/com/smartofc/mtgTablet/insertResve.do")
+                    .uri("/com/smartofc/mtgTabletResve/insert.do")
                     .header("Referer", referer)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(form)
@@ -211,16 +217,16 @@ public class BackendApiClient {
             if (e.getStatusCode().value() == 409) {
                 throw new BackendApiException("선택한 시간대에 이미 예약된 회의실이 있습니다.", e);
             }
-            throw new BackendApiException("회의실 예약 생성에 실패했습니다.", e);
+            throw new BackendApiException("회의실 예약 생성에 실패했습니다: " + e.getMessage(), e);
         } catch (HttpServerErrorException e) {
             logger.error("회의실 예약 생성 실패 - HTTP Server Error: {}", e.getMessage());
-            throw new BackendApiException("회의실 예약 생성에 실패했습니다.", e);
+            throw new BackendApiException("회의실 예약 생성에 실패했습니다: " + e.getMessage(), e);
         } catch (ResourceAccessException e) {
             logger.error("회의실 예약 생성 실패 - Network Error: {}", e.getMessage());
             throw new BackendApiException("회의실 예약 생성에 실패했습니다: 네트워크 문제가 발생했습니다.", e);
         } catch (Exception e) {
             logger.error("회의실 예약 생성 실패 - Unexpected Error: {}", e.getMessage());
-            throw new BackendApiException("회의실 예약 생성에 실패했습니다.", e);
+            throw new BackendApiException("회의실 예약 생성에 실패했습니다: 알 수 없는 오류가 발생했습니다.", e);
         }
     }
 
@@ -234,13 +240,13 @@ public class BackendApiClient {
         logger.info("회의실 예약 취소 시작 - 예약 ID: {}", reservationId);
         
         try {
-            Map<String, String> form = new HashMap<>();
-            form.put("resveId", reservationId);
-            form.put("sttDiv", "resveCancel");
+            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            form.add("resveId", reservationId);
+            form.add("sttDiv", "resveCancel");
 
             // API 호출
             ResultVO response = restClient.post()
-                    .uri("/com/smartofc/mtgTablet/deleteResve.do")
+                    .uri("/com/smartofc/mtgTabletResve/updateSttus.do")
                     .header("Referer", referer)
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(form)
@@ -253,19 +259,19 @@ public class BackendApiClient {
             
         } catch (HttpClientErrorException e) {
             logger.error("회의실 예약 취소 실패 - HTTP Client Error: {}", e.getMessage());
-            throw new BackendApiException("회의실 예약 취소에 실패했습니다.", e);
+            throw new BackendApiException("회의실 예약 취소에 실패했습니다: " + e.getMessage(), e);
         } catch (HttpServerErrorException e) {
             logger.error("회의실 예약 취소 실패 - HTTP Server Error: {}", e.getMessage());
-            throw new BackendApiException("회의실 예약 취소에 실패했습니다.", e);
+            throw new BackendApiException("회의실 예약 취소에 실패했습니다: " + e.getMessage(), e);
         } catch (ResourceAccessException e) {
             logger.error("회의실 예약 취소 실패 - Network Error: {}", e.getMessage());
             throw new BackendApiException("회의실 예약 취소에 실패했습니다: 네트워크 문제가 발생했습니다.", e);
         } catch (Exception e) {
             logger.error("회의실 예약 취소 실패 - Unexpected Error: {}", e.getMessage());
-            throw new BackendApiException("회의실 예약 취소에 실패했습니다.", e);
+            throw new BackendApiException("회의실 예약 취소에 실패했습니다: 알 수 없는 오류가 발생했습니다.", e);
         }
     }
-    
+
     /**
      * Backend API 예외 클래스
      */
