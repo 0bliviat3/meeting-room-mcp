@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: meeting-room-mcp
+  ai:
+    mcp:
+      server:
+        name: meeting-room
+        version: 1.0.0
+        type: SYNC
+        protocol: STREAMABLE
+        instructions: |
+          이 도구들은 사내 회의실 예약 시스템에 접근하기 위한 도구입니다.
+          회의실 조회, 가용성 확인, 예약 등록, 예약 취소 등의 기능을 제공합니다.
+          회의실 이름은 보통 "18층 3회의실" 같은 형식으로 표현됩니다.
+          예약 등록과 취소는 destructive operation이므로 실행 전 사용자에게 확인을 받으세요.
+        streamable-http:
+          mcp-endpoint: /mcp
+          keep-alive-interval: 30s
+
+# 기존 espora-min-ps-ofc 백엔드 연동 설정
+backend:
+  api:
+    base-url: ${BACKEND_BASE_URL:http://localhost:8081}
+    # 기존 시스템의 referer 검증을 통과시키기 위한 헤더 값
+    # MtgrmTabletController.isValidReferer()는 ".*/com/smartofc/mtgTablet.*\\.do" 패턴을 검사
+    referer: ${BACKEND_REFERER:http://localhost:8081/com/smartofc/mtgTablet_list.do}
+    connect-timeout: 5s
+    read-timeout: 15s
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    com.psnm.mcp.meetingroom: DEBUG
+    org.springframework.ai.mcp: DEBUG
