@@ -1,0 +1,44 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "github": {
+      "type": "local",
+      "command": [
+        "docker", "run", "-i", "--rm",
+        "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server:latest"
+      ],
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_PERSONAL_ACCESS_TOKEN}"
+      },
+      "enabled": true
+    }
+  },
+  "permission": {
+    "bash": {
+      "rm -rf *": "deny",
+      "rm -rf /*": "deny",
+      "git push --force*": "deny",
+      "git push -f*": "deny",
+      "git push origin main*": "deny",
+      "git push origin master*": "deny",
+      "sudo *": "deny",
+      "npm *": "deny",
+      "yarn *": "deny",
+      "npm publish*": "deny",
+      "docker compose down -v*": "ask",
+      "*": "allow"
+    },
+    "edit": {
+      ".env*": "ask",
+      "**/secrets/**": "deny",
+      "**/*.key": "deny",
+      "**/*.pem": "deny",
+      ".github/workflows/**": "ask"
+    }
+  },
+  "instructions": [
+    "AGENTS.md",
+    ".opencode/skills/*/SKILL.md"
+  ]
+}
