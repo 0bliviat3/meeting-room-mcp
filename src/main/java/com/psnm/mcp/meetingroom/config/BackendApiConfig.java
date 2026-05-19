@@ -15,31 +15,9 @@ public class BackendApiConfig {
 
     @Bean
     public RestClient restClient(BackendApiProperties properties) {
-        Duration connectTimeout = Duration.ofMillis(parseTimeout(properties.getConnectTimeout()));
-        Duration readTimeout = Duration.ofMillis(parseTimeout(properties.getReadTimeout()));
-        
         return RestClient.builder()
                 .baseUrl(properties.getBaseUrl())
-                .requestFactory(new OkHttp3ClientHttpRequestFactory())
                 .build();
-    }
-
-    private long parseTimeout(String timeoutStr) {
-        if (timeoutStr == null || timeoutStr.isEmpty()) {
-            return 5000; // default 5s
-        }
-        
-        // Remove 's' suffix if present
-        String trimmed = timeoutStr.trim();
-        if (trimmed.endsWith("s")) {
-            trimmed = trimmed.substring(0, trimmed.length() - 1);
-        }
-        
-        try {
-            return Long.parseLong(trimmed) * 1000; // convert seconds to milliseconds
-        } catch (NumberFormatException e) {
-            return 5000; // default 5s on parse error
-        }
     }
 
     @Bean
