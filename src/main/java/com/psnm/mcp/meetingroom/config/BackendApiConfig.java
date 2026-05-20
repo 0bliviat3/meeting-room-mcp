@@ -15,16 +15,35 @@ public class BackendApiConfig {
 
     @Bean
     public RestClient restClient(BackendApiProperties properties) {
+        // Configure timeout settings properly
         OkHttp3ClientHttpRequestFactory factory = new OkHttp3ClientHttpRequestFactory();
-        // Configure timeouts from properties
+        
+        // Parse and set connect timeout from properties
         if (properties.getConnectTimeout() != null && !properties.getConnectTimeout().isEmpty()) {
-            Duration connectTimeout = Duration.parse(properties.getConnectTimeout());
-            factory.setConnectTimeout((int) connectTimeout.toMillis());
+            try {
+                Duration connectTimeout = Duration.parse(properties.getConnectTimeout());
+                factory.setConnectTimeout((int) connectTimeout.toMillis());
+            } catch (Exception e) {
+                // Use default if parsing fails
+                factory.setConnectTimeout(5000); // 5 seconds default
+            }
+        } else {
+            factory.setConnectTimeout(5000); // 5 seconds default
         }
+        
+        // Parse and set read timeout from properties  
         if (properties.getReadTimeout() != null && !properties.getReadTimeout().isEmpty()) {
-            Duration readTimeout = Duration.parse(properties.getReadTimeout());
-            factory.setReadTimeout((int) readTimeout.toMillis());
+            try {
+                Duration readTimeout = Duration.parse(properties.getReadTimeout());
+                factory.setReadTimeout((int) readTimeout.toMillis());
+            } catch (Exception e) {
+                // Use default if parsing fails
+                factory.setReadTimeout(15000); // 15 seconds default
+            }
+        } else {
+            factory.setReadTimeout(15000); // 15 seconds default
         }
+        
         return RestClient.builder()
                 .baseUrl(properties.getBaseUrl())
                 .requestFactory(factory)
