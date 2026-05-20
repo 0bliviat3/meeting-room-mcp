@@ -61,6 +61,12 @@
             <version>${spring.ai.version}</version>
         </dependency>
 
+        <!-- Spring Boot Starter WebMvc (for interceptors) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
         <!-- Validation -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
