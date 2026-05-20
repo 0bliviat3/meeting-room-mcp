@@ -50,6 +50,20 @@
             <artifactId>spring-ai-mcp</artifactId>
             <version>1.1.6</version>
         </dependency>
+        
+        <!-- Additional MCP dependencies -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-mcp-annotations</artifactId>
+            <version>1.1.6</version>
+        </dependency>
+        
+        <!-- Core Spring AI dependencies -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-core</artifactId>
+            <version>1.1.6</version>
+        </dependency>
 
         <!-- Validation -->
         <dependency>
