@@ -8,8 +8,6 @@ import org.springframework.web.client.RestClient;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
 import java.time.Duration;
-import java.net.SocketTimeoutException;
-import java.net.ConnectTimeoutException;
 
 @Configuration
 @EnableConfigurationProperties(BackendApiProperties.class)
