@@ -15,9 +15,19 @@ public class BackendApiConfig {
 
     @Bean
     public RestClient restClient(BackendApiProperties properties) {
+        OkHttp3ClientHttpRequestFactory factory = new OkHttp3ClientHttpRequestFactory();
+        // Configure timeouts from properties
+        if (properties.getConnectTimeout() != null && !properties.getConnectTimeout().isEmpty()) {
+            Duration connectTimeout = Duration.parse(properties.getConnectTimeout());
+            factory.setConnectTimeout((int) connectTimeout.toMillis());
+        }
+        if (properties.getReadTimeout() != null && !properties.getReadTimeout().isEmpty()) {
+            Duration readTimeout = Duration.parse(properties.getReadTimeout());
+            factory.setReadTimeout((int) readTimeout.toMillis());
+        }
         return RestClient.builder()
                 .baseUrl(properties.getBaseUrl())
-                .requestFactory(new OkHttp3ClientHttpRequestFactory())
+                .requestFactory(factory)
                 .build();
     }
 

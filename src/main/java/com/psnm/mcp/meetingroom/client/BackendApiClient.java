@@ -137,6 +137,7 @@ public class BackendApiClient {
             ListVO<OfficeDto> response = restClient.post()
                     .uri("/com/smartofc/mtgTabletResve/selectResveList.do")
                     .header("Referer", referer)
+                    .header("x-emp-no", UserContext.getEmpNo())
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(form)
                     .retrieve()
@@ -178,7 +179,7 @@ public class BackendApiClient {
             meetingRoomId, startDate, startTime, endTime);
         
         try {
-            MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
+            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
             form.add("mtgrmId", meetingRoomId);
             form.add("dt", startDate);
             form.add("bgnTime", startTime);
@@ -198,6 +199,7 @@ public class BackendApiClient {
             ResultVO response = restClient.post()
                     .uri("/com/smartofc/mtgTabletResve/insert.do")
                     .header("Referer", referer)
+                    .header("x-emp-no", UserContext.getEmpNo())
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(form)
                     .retrieve()
@@ -244,6 +246,7 @@ public class BackendApiClient {
             ResultVO response = restClient.post()
                     .uri("/com/smartofc/mtgTabletResve/updateSttus.do")
                     .header("Referer", referer)
+                    .header("x-emp-no", UserContext.getEmpNo())
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(form)
                     .retrieve()
