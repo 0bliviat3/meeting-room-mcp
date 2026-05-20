@@ -175,7 +175,7 @@ public class BackendApiClient {
             meetingRoomId, startDate, startTime, endTime);
         
         try {
-            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
             form.add("mtgrmId", meetingRoomId);
             form.add("dt", startDate);
             form.add("bgnTime", startTime);
@@ -227,17 +227,18 @@ public class BackendApiClient {
      * 예약을 취소합니다.
      * 
      * @param reservationId 예약 ID
+     * @param psnetEventId 이벤트 ID
      * @return 예약 취소 결과
      */
-    public ResultVO cancelReservation(String reservationId) {
+    public ResultVO cancelReservation(String reservationId, String psnetEventId) {
         logger.info("회의실 예약 취소 시작 - 예약 ID: {}", reservationId);
         
         try {
-            MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
             form.add("resveId", reservationId);
             form.add("sttDiv", "resveCancel");
             form.add("lastUpdusrId", UserContext.getEmpNo());
-            form.add("psnetEventId", ""); // Empty string as placeholder
+            form.add("psnetEventId", psnetEventId); // Changed from empty string to parameter
 
             // API 호출
             ResultVO response = restClient.post()
