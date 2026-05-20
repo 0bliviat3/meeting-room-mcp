@@ -5,9 +5,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
-import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 
 import java.time.Duration;
+import java.net.SocketTimeoutException;
+import java.net.ConnectTimeoutException;
 
 @Configuration
 @EnableConfigurationProperties(BackendApiProperties.class)
@@ -16,7 +18,7 @@ public class BackendApiConfig {
     @Bean
     public RestClient restClient(BackendApiProperties properties) {
         // Configure timeout settings properly
-        OkHttp3ClientHttpRequestFactory factory = new OkHttp3ClientHttpRequestFactory();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         
         // Parse and set connect timeout from properties
         if (properties.getConnectTimeout() != null && !properties.getConnectTimeout().isEmpty()) {

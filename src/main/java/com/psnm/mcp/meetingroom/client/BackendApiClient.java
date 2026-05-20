@@ -13,8 +13,6 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
-import java.time.Duration;
 
 public class BackendApiClient {
 
@@ -47,7 +45,6 @@ public class BackendApiClient {
             ListVO<OfficeDto> response = restClient.post()
                     .uri("/com/smartofc/mtgTablet/selectOffmList.do")
                     .header("Referer", referer)
-                    .header("x-emp-no", UserContext.getEmpNo())
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(form)
                     .retrieve()
@@ -132,13 +129,11 @@ public class BackendApiClient {
         try {
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
             form.add("rsvctmId", UserContext.getEmpNo()); // 실제 구현 시 UserContext에서 가져오기
-            form.add("scope", "mine");
 
             // API 호출
             ListVO<OfficeDto> response = restClient.post()
                     .uri("/com/smartofc/mtgTabletResve/selectResveList.do")
                     .header("Referer", referer)
-                    .header("x-emp-no", UserContext.getEmpNo())
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(form)
                     .retrieve()
@@ -175,7 +170,7 @@ public class BackendApiClient {
      * @return 예약 생성 결과
      */
     public ResultVO createReservation(String meetingRoomId, String startDate, String startTime, 
-                                      String endTime, String purpose) {
+                                       String endTime, String purpose) {
         logger.info("회의실 예약 생성 시작 - 회의실 ID: {}, 날짜: {}, 시간: {}-{}", 
             meetingRoomId, startDate, startTime, endTime);
         
@@ -200,7 +195,6 @@ public class BackendApiClient {
             ResultVO response = restClient.post()
                     .uri("/com/smartofc/mtgTabletResve/insert.do")
                     .header("Referer", referer)
-                    .header("x-emp-no", UserContext.getEmpNo())
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(form)
                     .retrieve()
@@ -242,12 +236,13 @@ public class BackendApiClient {
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
             form.add("resveId", reservationId);
             form.add("sttDiv", "resveCancel");
+            form.add("lastUpdusrId", UserContext.getEmpNo());
+            form.add("psnetEventId", ""); // Empty string as placeholder
 
             // API 호출
             ResultVO response = restClient.post()
                     .uri("/com/smartofc/mtgTabletResve/updateSttus.do")
                     .header("Referer", referer)
-                    .header("x-emp-no", UserContext.getEmpNo())
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(form)
                     .retrieve()
