@@ -1,9 +1,10 @@
 package com.psnm.mcp.meetingroom.tools;
 
 import com.psnm.mcp.meetingroom.client.BackendApiClient;
-import com.psnm.mcp.meetingroom.dto.*;
+import com.psnm.mcp.meetingroom.client.dto.ListVO;
+import com.psnm.mcp.meetingroom.client.dto.OfficeDto;
 import com.psnm.mcp.meetingroom.tools.MeetingRoomTools;
-import com.psnm.mcp.meetingroom.util.UserContext;
+import com.psnm.mcp.meetingroom.context.UserContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +50,7 @@ class MeetingRoomToolsTest {
 
         // Then
         assertNotNull(result);
-        assertEquals("예약이 성공적으로 생성되었습니다.", result.getMessage());
+        assertEquals("회의실 예약이 성공적으로 생성되었습니다.", result.getMessage());
     }
 
     @Test
