@@ -135,6 +135,20 @@ class MeetingRoomToolsTest {
     }
 
     @Test
+    void createReservation_ValidationFailure_WithEmptyValues() {
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> 
+            meetingRoomTools.createReservation("", "", "", "", ""));
+    }
+
+    @Test
+    void cancelReservation_ValidationFailure_WithEmptyValues() {
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> 
+            meetingRoomTools.cancelReservation("", ""));
+    }
+
+    @Test
     void findAvailableRooms_ApiErrorHandling() {
         // Given
         String startDate = "2023-12-01";
