@@ -1,8 +1,8 @@
-I have successfully fixed the compilation error in BackendApiClient.java.
+I have successfully fixed the compilation error in BackendApiClient.java. 
 
 The issue was that after line 283 in the file, there were duplicate method declarations for:
 - findOffices
-- findAvailableRooms
+- findAvailableRooms  
 - getMyReservations
 - createReservation
 - cancelReservation
