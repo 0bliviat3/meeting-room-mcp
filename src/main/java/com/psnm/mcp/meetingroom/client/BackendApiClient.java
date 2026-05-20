@@ -4,6 +4,8 @@ import com.psnm.mcp.meetingroom.client.dto.ListVO;
 import com.psnm.mcp.meetingroom.client.dto.OfficeDto;
 import com.psnm.mcp.meetingroom.client.dto.ResultVO;
 import com.psnm.mcp.meetingroom.context.UserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.HttpClientErrorException;
@@ -69,7 +71,6 @@ public class BackendApiClient {
             logger.error("사무실 목록 조회 실패 - Unexpected Error: {}", e.getMessage());
             throw new BackendApiException("사무실 목록 조회에 실패했습니다: 알 수 없는 오류가 발생했습니다.", e);
         }
-    }
     }
 
     /**
