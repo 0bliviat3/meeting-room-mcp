@@ -132,7 +132,7 @@ public class MeetingRoomTools {
             // }
             
             // 실제 예약 취소 호출은 BackendApiClient를 통해
-            backendApiClient.cancelReservation(reservationId);
+            backendApiClient.cancelReservation(reservationId, psnetEventId);
             return new CancelReservationResponse("예약이 성공적으로 취소되었습니다.");
             
         } catch (Exception e) {
