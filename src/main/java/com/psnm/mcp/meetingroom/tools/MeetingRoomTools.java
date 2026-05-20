@@ -85,8 +85,8 @@ public class MeetingRoomTools {
         // validation은 Tool 레벨에서만 처리
         try {
             // 실제 예약 생성 호출은 BackendApiClient를 통해
-            // 실제 구현에서는 backendApiClient.createReservation(...) 호출
-            return new CreateReservationResponse("예약이 성공적으로 생성되었습니다.");
+            backendApiClient.createReservation(meetingRoomId, startDate, startTime, endTime, purpose);
+            return new CreateReservationResponse("회의실 예약이 성공적으로 생성되었습니다.");
             
         } catch (Exception e) {
             // 예외는 Service 계층에서 처리
@@ -125,13 +125,14 @@ public class MeetingRoomTools {
         
         // validation은 Tool 레벨에서만 처리
         try {
-            // 예약자 본인 검증 (실제 구현)
+            // 예약자 본인 검증
             // ReservationDto reservation = backendApiClient.findReservation(reservationId);
             // if (!reservation.getRsvctmId().equals(UserContext.getEmpNo())) {
             //     throw new IllegalArgumentException("본인이 등록한 예약만 취소할 수 있습니다.");
             // }
             
             // 실제 예약 취소 호출은 BackendApiClient를 통해
+            backendApiClient.cancelReservation(reservationId);
             return new CancelReservationResponse("예약이 성공적으로 취소되었습니다.");
             
         } catch (Exception e) {
