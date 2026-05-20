@@ -13,8 +13,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.ai.mcp.annotation.McpTool;
-import org.springframework.ai.mcp.annotation.McpToolParam;
+import org.springframework.ai.mcp.annotation.spring.McpTool;
+import org.springframework.ai.mcp.annotation.spring.McpToolParam;
 
 @Component
 public class MeetingRoomTools {
