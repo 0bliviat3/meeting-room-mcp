@@ -4,6 +4,7 @@ import com.psnm.mcp.meetingroom.client.BackendApiClient;
 import com.psnm.mcp.meetingroom.client.dto.ListVO;
 import com.psnm.mcp.meetingroom.client.dto.OfficeDto;
 import com.psnm.mcp.meetingroom.client.dto.MeetingRoomDto;
+import com.psnm.mcp.meetingroom.client.dto.ReservationDto;
 import com.psnm.mcp.meetingroom.context.UserContext;
 import org.springframework.stereotype.Component;
 
@@ -102,7 +103,9 @@ public class MeetingRoomTools {
      */
     @McpTool(
         name = "cancel_reservation",
-        description = "회의실 예약을 취소합니다. 사용자가 '회의실 예약 취소해줘'라고 요청할 때 호출됩니다. 본인이 예약한 건만 취소 가능하도록 검증이 필요하며, 그룹웨어 일정도 같이 취소되도록 psnetEventId 파라미터를 전달해야 합니다."
+        description = "회의실 예약을 취소합니다. " +
+                      "resveId는 list_reservations 결과의 resveId 필드를 사용합니다. " +
+                      "psnetEventId가 null인 경우 빈 문자열로 전달합니다."
     )
     public CancelReservationResponse cancelReservation(
             @McpToolParam(
@@ -113,7 +116,7 @@ public class MeetingRoomTools {
             String reservationId,
             
             @McpToolParam(
-                description = "그룹웨어 이벤트 ID. 취소 시 그룹웨어 일정도 같이 취소되므로 권장"
+                description = "그룹웨어 이벤트 ID. 취소 시 그룹웨어 일정도 같이 취소되도록 권장"
             )
             @Valid
             String psnetEventId) {
@@ -199,9 +202,15 @@ public class MeetingRoomTools {
      */
     @McpTool(
         name = "list_reservations",
-        description = "사용자의 예약 목록을 조회합니다. 사용자가 '내 예약 알려줘' 또는 '내가 예약한 회의실 찾아줘'라고 요청할 때 호출됩니다."
+        description = "내가 예약한 회의실 목록을 조회합니다. " +
+                      "'내 예약 보여줘', '오늘 예약 있어?' 같은 요청에 사용합니다. " +
+                      "각 항목에는 resveId(예약 ID), mtgSj(회의 제목), dt(날짜), " +
+                      "bgnTime~endTime(시간), mtgrmNm(회의실 이름), offmNm(층/건물), " +
+                      "psnetEventId(PSNET 이벤트 ID)가 포함됩니다. " +
+                      "예약 취소 요청이 들어오면 이 도구를 먼저 호출하여 " +
+                      "resveId와 psnetEventId를 확인한 후 cancel_reservation에 전달해야 합니다."
     )
-    public List<OfficeDto> getMyReservations() {
+    public List<ReservationDto> getMyReservations() {
         
         // audit 로깅
         auditLogger.info("[{}] [{}] [get_my_reservations]", 
@@ -210,7 +219,7 @@ public class MeetingRoomTools {
         // validation은 Tool 레벨에서만 처리
         try {
             // 실제 예약 목록 조회 호출은 BackendApiClient를 통해
-            ListVO<OfficeDto> response = backendApiClient.getMyReservations();
+            ListVO<ReservationDto> response = backendApiClient.getMyReservations();
             return response != null ? response.getRows() : List.of();
             
         } catch (Exception e) {
