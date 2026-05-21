@@ -34,7 +34,6 @@ Spring Boot 기반의 회의실 예약 MCP 서버입니다. 사내 Tablet API(es
 - **Spring AI**: 1.1.6 (MCP Streamable HTTP)
 - **Java**: 17+
 - **Transport**: Streamable HTTP (`/mcp` 엔드포인트)
-- **Backend API**: espora-min-ps-ofc Tablet API
 
 ---
 
@@ -332,6 +331,4 @@ server:
 
 ### 주의사항
 
-- Spring Boot는 `.env` 파일을 자동으로 읽지 않습니다. 환경변수는 OS 수준에서 설정하거나 `-D` JVM 인수로 전달하세요.
 - `x-emp-no` 헤더는 Claude Desktop 설정(브리지 args)에서 관리합니다. MCP 서버 코드에서는 이 헤더를 백엔드로 전달하지 않고 `UserContext`(ThreadLocal)에 사번을 저장하는 용도로만 사용합니다.
-- 백엔드 `Referer` 헤더는 `MtgrmTabletController.isValidReferer()` 검증을 통과하기 위한 값입니다. 실제 백엔드 URL에 맞게 설정이 필요합니다.
