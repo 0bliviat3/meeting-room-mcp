@@ -41,30 +41,10 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- Spring Boot Starter WebFlux -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
-        </dependency>
-
-        <!-- Spring AI MCP Server -->
+        <!-- MCP Server (WebMVC 기반, /mcp 엔드포인트 자동 등록) -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-mcp</artifactId>
-            <version>${spring.ai.version}</version>
-        </dependency>
-
-        <!-- Spring AI MCP Annotations -->
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-mcp-annotations</artifactId>
-            <version>${spring.ai.version}</version>
-        </dependency>
-
-        <!-- Spring Boot Starter WebMvc (for interceptors) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
         </dependency>
 
         <!-- Validation -->

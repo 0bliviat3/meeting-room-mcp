@@ -84,7 +84,6 @@ public class BackendApiClient {
         
         try {
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-            form.add("dt", startDate);
             form.add("bgnTime", startTime);
             form.add("endTime", endTime);
             form.add("whereType", "available");
