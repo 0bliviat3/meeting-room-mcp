@@ -3,6 +3,7 @@ package com.psnm.mcp.meetingroom.tools;
 import com.psnm.mcp.meetingroom.client.BackendApiClient;
 import com.psnm.mcp.meetingroom.client.dto.ListVO;
 import com.psnm.mcp.meetingroom.client.dto.OfficeDto;
+import com.psnm.mcp.meetingroom.client.dto.MeetingRoomDto;
 import com.psnm.mcp.meetingroom.context.UserContext;
 import org.springframework.stereotype.Component;
 
@@ -142,22 +143,24 @@ public class MeetingRoomTools {
     /**
      * 가용 회의실을 조회합니다.
      * 
-     * @param startDate 조회할 날짜 (yyyy-MM-dd 형식)
+     * @param offmId 사무실 ID (list_offices 결과의 offmId)
      * @param startTime 조회 시작 시간 (HH:mm 형식)
      * @param endTime 조회 종료 시간 (HH:mm 형식)
      * @return 가용 회의실 목록
      */
     @McpTool(
         name = "check_availability",
-        description = "회의실 예약 가능 여부를 조회합니다. 사용자가 '회의실이 비어있나요?' 또는 '회의실이 어디에 있어요?'라고 요청할 때 호출됩니다."
+        description = "특정 사무실(건물/층)에서 예약 가능한 회의실 목록을 조회합니다. " +
+                      "'3층 회의실 비어있어?', '본사 회의실 예약 가능한 곳 알려줘' 같은 요청에 사용합니다. " +
+                      "offmId는 list_offices 도구로 먼저 조회해서 전달해야 합니다."
     )
-    public List<OfficeDto> findAvailableRooms(
+    public List<MeetingRoomDto> findAvailableRooms(
             @McpToolParam(
-                description = "조회 날짜 (yyyy-MM-dd 형식)"
+                description = "사무실 ID (list_offices 결과의 offmId)"
             )
             @Valid
-            @NotBlank(message = "조회 날짜는 필수입니다.")
-            String startDate,
+            @NotBlank(message = "사무실 ID는 필수입니다.")
+            String offmId,
 
             @McpToolParam(
                 description = "조회 시작 시간 (HH:mm 형식)"
@@ -174,13 +177,13 @@ public class MeetingRoomTools {
             String endTime) {
         
         // audit 로깅
-        auditLogger.info("[{}] [{}] [find_available_rooms] [startDate: {}, startTime: {}, endTime: {}]", 
-            LocalDate.now(), UserContext.getEmpNo(), startDate, startTime, endTime);
+        auditLogger.info("[{}] [{}] [find_available_rooms] [offmId: {}, startTime: {}, endTime: {}]", 
+            LocalDate.now(), UserContext.getEmpNo(), offmId, startTime, endTime);
         
         // validation은 Tool 레벨에서만 처리
         try {
             // 실제 회의실 조회 호출은 BackendApiClient를 통해
-            ListVO<OfficeDto> response = backendApiClient.findAvailableRooms(startDate, startTime, endTime);
+            ListVO<MeetingRoomDto> response = backendApiClient.findAvailableRooms(offmId, startTime, endTime);
             return response != null ? response.getRows() : List.of();
             
         } catch (Exception e) {
@@ -225,7 +228,10 @@ public class MeetingRoomTools {
      */
     @McpTool(
         name = "list_offices",
-        description = "사내 사무실(건물/층) 목록을 조회합니다. 사용자가 '어디에 사무실이 있나', '지점이 어디 있나' 같은 질문을 할 때 사용하세요."
+        description = "전체 사무실(건물/층) 목록을 조회합니다. " +
+                      "각 항목에는 offmId(사무실 ID), offmNm(사무실 이름), florNm(층 이름), buldNm(건물명)이 포함됩니다. " +
+                      "'3층', '본사', 'B1층' 같은 자연어 요청이 들어오면 이 도구를 먼저 호출해서 " +
+                      "해당하는 offmId를 찾은 후 check_availability에 전달해야 합니다."
     )
     public List<OfficeDto> listOffices(
             @McpToolParam(
