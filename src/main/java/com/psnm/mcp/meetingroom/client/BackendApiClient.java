@@ -2,6 +2,7 @@ package com.psnm.mcp.meetingroom.client;
 
 import com.psnm.mcp.meetingroom.client.dto.ListVO;
 import com.psnm.mcp.meetingroom.client.dto.OfficeDto;
+import com.psnm.mcp.meetingroom.client.dto.MeetingRoomDto;
 import com.psnm.mcp.meetingroom.client.dto.ResultVO;
 import com.psnm.mcp.meetingroom.context.UserContext;
 import org.slf4j.Logger;
@@ -73,29 +74,30 @@ public class BackendApiClient {
     /**
      * 예약 가능한 회의실 목록을 조회합니다.
      * 
-     * @param startDate 날짜 (yyyy-MM-dd 형식)
+     * @param offmId 사무실 ID
      * @param startTime 시작 시간 (HH:mm 형식)
      * @param endTime 종료 시간 (HH:mm 형식)
      * @return 예약 가능한 회의실 목록
      */
-    public ListVO<OfficeDto> findAvailableRooms(String startDate, String startTime, String endTime) {
-        logger.info("가용 회의실 조회 시작 - 날짜: {}, 시작시간: {}, 종료시간: {}", 
-            startDate, startTime, endTime);
+    public ListVO<MeetingRoomDto> findAvailableRooms(String offmId, String startTime, String endTime) {
+        logger.info("가용 회의실 조회 시작 - 사무실 ID: {}, 시작시간: {}, 종료시간: {}", 
+            offmId, startTime, endTime);
         
         try {
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+            form.add("offmId", offmId);
             form.add("bgnTime", startTime);
             form.add("endTime", endTime);
             form.add("whereType", "available");
 
             // API 호출
-            ListVO<OfficeDto> response = restClient.post()
+            ListVO<MeetingRoomDto> response = restClient.post()
                     .uri("/com/smartofc/mtgTablet/selectMtgRmList.do")
                     .header("Referer", referer)
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(form)
                     .retrieve()
-                    .body(new org.springframework.core.ParameterizedTypeReference<ListVO<OfficeDto>>() {});
+                    .body(new org.springframework.core.ParameterizedTypeReference<ListVO<MeetingRoomDto>>() {});
 
             logger.info("가용 회의실 조회 성공 - 회의실 수: {}", 
                 response != null && response.getRows() != null ? response.getRows().size() : 0);

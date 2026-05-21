@@ -3,6 +3,7 @@ package com.psnm.mcp.meetingroom.tools;
 import com.psnm.mcp.meetingroom.client.BackendApiClient;
 import com.psnm.mcp.meetingroom.client.dto.ListVO;
 import com.psnm.mcp.meetingroom.client.dto.OfficeDto;
+import com.psnm.mcp.meetingroom.client.dto.MeetingRoomDto;
 import com.psnm.mcp.meetingroom.tools.MeetingRoomTools;
 import com.psnm.mcp.meetingroom.context.UserContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,17 +69,17 @@ class MeetingRoomToolsTest {
     @Test
     void findAvailableRooms_Successful() {
         // Given
-        String startDate = "2023-12-01";
+        String offmId = "OFFM001";
         String startTime = "10:00";
         String endTime = "11:00";
         
-        ListVO<OfficeDto> mockResponse = new ListVO<>();
-        mockResponse.setRows(List.of(new OfficeDto()));
+        ListVO<MeetingRoomDto> mockResponse = new ListVO<>();
+        mockResponse.setRows(List.of(new MeetingRoomDto()));
         when(backendApiClient.findAvailableRooms(anyString(), anyString(), anyString()))
                 .thenReturn(mockResponse);
 
         // When
-        var result = meetingRoomTools.findAvailableRooms(startDate, startTime, endTime);
+        var result = meetingRoomTools.findAvailableRooms(offmId, startTime, endTime);
 
         // Then
         assertNotNull(result);
@@ -149,7 +150,7 @@ class MeetingRoomToolsTest {
     @Test
     void findAvailableRooms_ApiErrorHandling() {
         // Given
-        String startDate = "2023-12-01";
+        String offmId = "OFFM001";
         String startTime = "10:00";
         String endTime = "11:00";
         when(backendApiClient.findAvailableRooms(anyString(), anyString(), anyString()))
@@ -157,7 +158,7 @@ class MeetingRoomToolsTest {
 
         // When & Then
         assertThrows(RuntimeException.class, () -> 
-            meetingRoomTools.findAvailableRooms(startDate, startTime, endTime));
+            meetingRoomTools.findAvailableRooms(offmId, startTime, endTime));
     }
 
     @Test
