@@ -3,6 +3,7 @@ package com.psnm.mcp.meetingroom.client;
 import com.psnm.mcp.meetingroom.client.dto.ListVO;
 import com.psnm.mcp.meetingroom.client.dto.OfficeDto;
 import com.psnm.mcp.meetingroom.client.dto.MeetingRoomDto;
+import com.psnm.mcp.meetingroom.client.dto.ReservationDto;
 import com.psnm.mcp.meetingroom.client.dto.ResultVO;
 import com.psnm.mcp.meetingroom.context.UserContext;
 import org.slf4j.Logger;
@@ -124,7 +125,7 @@ public class BackendApiClient {
      * 
      * @return 사용자의 예약 목록
      */
-    public ListVO<OfficeDto> getMyReservations() {
+    public ListVO<ReservationDto> getMyReservations() {
         logger.info("내 예약 목록 조회 시작");
         
         try {
@@ -132,13 +133,13 @@ public class BackendApiClient {
             form.add("rsvctmId", UserContext.getEmpNo()); // 실제 구현 시 UserContext에서 가져오기
 
             // API 호출
-            ListVO<OfficeDto> response = restClient.post()
+            ListVO<ReservationDto> response = restClient.post()
                     .uri("/com/smartofc/mtgTabletResve/selectResveList.do")
                     .header("Referer", referer)
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(form)
                     .retrieve()
-                    .body(new org.springframework.core.ParameterizedTypeReference<ListVO<OfficeDto>>() {});
+                    .body(new org.springframework.core.ParameterizedTypeReference<ListVO<ReservationDto>>() {});
 
             logger.info("내 예약 목록 조회 성공 - 예약 수: {}", 
                 response != null && response.getRows() != null ? response.getRows().size() : 0);

@@ -4,6 +4,7 @@ import com.psnm.mcp.meetingroom.client.BackendApiClient;
 import com.psnm.mcp.meetingroom.client.dto.ListVO;
 import com.psnm.mcp.meetingroom.client.dto.OfficeDto;
 import com.psnm.mcp.meetingroom.client.dto.MeetingRoomDto;
+import com.psnm.mcp.meetingroom.client.dto.ReservationDto;
 import com.psnm.mcp.meetingroom.tools.MeetingRoomTools;
 import com.psnm.mcp.meetingroom.context.UserContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,16 +90,26 @@ class MeetingRoomToolsTest {
     @Test
     void getMyReservations_Successful() {
         // Given
-        ListVO<OfficeDto> mockResponse = new ListVO<>();
-        mockResponse.setRows(List.of(new OfficeDto()));
+        ReservationDto reservation = new ReservationDto();
+        reservation.setResveId("d320112688bc4cab97f8eb84a057fab3");
+        reservation.setMtgSj("그룹웨어 미팅");
+        reservation.setDt("2026-05-21");
+        reservation.setBgnTime("14:00");
+        reservation.setEndTime("15:00");
+        reservation.setMtgrmNm("2회의실(화상)");
+
+        ListVO<ReservationDto> mockResponse = new ListVO<>();
+        mockResponse.setRows(List.of(reservation));
         when(backendApiClient.getMyReservations()).thenReturn(mockResponse);
 
         // When
-        var result = meetingRoomTools.getMyReservations();
+        List<ReservationDto> result = meetingRoomTools.getMyReservations();
 
         // Then
         assertNotNull(result);
-        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+        assertEquals("d320112688bc4cab97f8eb84a057fab3", result.get(0).getResveId());
+        assertEquals("그룹웨어 미팅", result.get(0).getMtgSj());
     }
 
     @Test
