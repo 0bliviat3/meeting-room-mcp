@@ -70,7 +70,7 @@ src/main/java/com/psnm/mcp/meetingroom/
 | 변수 | 필수 | 설명 | 기본값 |
 |------|------|------|--------|
 | `BACKEND_BASE_URL` | ✅ | Tablet API 서버 주소 | `http://localhost:8081` |
-| `BACKEND_REFERER` | 선택 | Referer 헤더값 (백엔드 검증용) | `http://localhost:8081/com/smartofc/mtgTablet_list.do` |
+| `BACKEND_REFERER` | 선택 | Referer 헤더값 (백엔드 검증용) | `http://localhost:8081/backend-url` |
 | `TZ` | 선택 | 타임존 | `Asia/Seoul` |
 
 ### 방법 1 — 로컬 직접 실행 (Java 필요)
@@ -102,7 +102,7 @@ docker run -d \
   --name meeting-room-mcp \
   -p 8080:8080 \
   -e BACKEND_BASE_URL=http://실제백엔드주소:8081 \
-  -e BACKEND_REFERER=http://실제백엔드주소:8081/com/smartofc/mtgTablet_list.do \
+  -e BACKEND_REFERER=http://실제백엔드주소:8081/backend-url \
   -e TZ=Asia/Seoul \
   --restart unless-stopped \
   meeting-room-mcp
@@ -114,7 +114,7 @@ docker-compose 사용 시:
 # .env 파일 생성
 cat > .env << EOF
 BACKEND_BASE_URL=http://실제백엔드주소:8081
-BACKEND_REFERER=http://실제백엔드주소:8081/com/smartofc/mtgTablet_list.do
+BACKEND_REFERER=http://실제백엔드주소:8081/backend-url
 TZ=Asia/Seoul
 EOF
 
@@ -321,7 +321,7 @@ mvn clean package -DskipTests
 backend:
   api:
     base-url: ${BACKEND_BASE_URL:http://localhost:8081}
-    referer: ${BACKEND_REFERER:http://localhost:8081/com/smartofc/mtgTablet_list.do}
+    referer: ${BACKEND_REFERER:http://localhost:8081/backend-url}
     connect-timeout: 5s
     read-timeout: 15s
 
