@@ -6,6 +6,6 @@ services:
       - "8080:8080"
     environment:
       BACKEND_BASE_URL: ${BACKEND_BASE_URL:-http://localhost:8081}
-      BACKEND_REFERER: ${BACKEND_REFERER:-http://localhost:8081/com/smartofc/mtgTablet_list.do}
+      BACKEND_REFERER: ${BACKEND_REFERER:-http://localhost:8081/your-backend-path}
       TZ: ${TZ:-Asia/Seoul}
     restart: unless-stopped
