@@ -4,9 +4,9 @@
 
 - **작성일**: 2026-05-19
 - **프로젝트명**: `meeting-room-mcp` (가칭)
-- **목적**: 기존 사내 회의실 예약시스템(`espora-min-ps-ofc`)을 wrapping하는 MCP 서버 구축. Claude Desktop 사용자가 자연어로 회의실을 조회/예약/취소할 수 있도록 한다.
+- **목적**: 기존 사내 회의실 예약시스템을 wrapping하는 MCP 서버 구축. Claude Desktop 사용자가 자연어로 회의실을 조회/예약/취소할 수 있도록 한다.
 - **대상 독자**: 구현 담당 coder AI agent
-- **참조 프로젝트**: `E:\_JavaDev\workspace\espora-min-ps-ofc` (기존 예약시스템 소스)
+- **참조 프로젝트**: (기존 예약시스템 소스 경로)
 
 ---
 
@@ -14,11 +14,11 @@
 
 ### 1.1 배경
 
-작년(2025년)에 사내 회의실/좌석 예약시스템 `espora-min-ps-ofc`를 구축 완료한 상태다. 회의실 앞에 설치된 태블릿을 통해 예약 조회 및 등록이 가능하다. 올해는 이 시스템에 자연어 인터페이스를 추가하여, Claude Desktop을 사용하는 사내 구성원 누구나 자연어로 회의실 예약을 처리할 수 있도록 한다.
+작년(2025년)에 사내 회의실/좌석 예약시스템을 구축 완료한 상태다. 회의실 앞에 설치된 태블릿을 통해 예약 조회 및 등록이 가능하다. 올해는 이 시스템에 자연어 인터페이스를 추가하여, Claude Desktop을 사용하는 사내 구성원 누구나 자연어로 회의실 예약을 처리할 수 있도록 한다.
 
 ### 1.2 접근 방식
 
-기존 예약시스템에는 태블릿용으로 만들어진 referer 기반 API endpoint 군이 존재한다 (`MtgrmTabletController`). 이 endpoint들은 별도 인증 없이 사번을 파라미터로 받아 예약 처리한다. 본 MCP 서버는 이 태블릿 API를 그대로 호출하는 wrapper로 동작한다.
+기존 예약시스템에는 태블릿용으로 만들어진 referer 기반 API endpoint 군이 존재한다. 이 endpoint들은 별도 인증 없이 사번을 파라미터로 받아 예약 처리한다. 본 MCP 서버는 이 태블릿 API를 그대로 호출하는 wrapper로 동작한다.
 
 ### 1.3 범위
 
@@ -167,8 +167,8 @@ backend:
   api:
     base-url: ${BACKEND_BASE_URL:http://localhost:8081}
     # 기존 시스템의 referer 검증을 통과시키기 위한 헤더 값
-    # MtgrmTabletController.isValidReferer()는 ".*/com/smartofc/mtgTablet.*\\.do" 패턴을 검사
-    referer: ${BACKEND_REFERER:http://localhost:8081/com/smartofc/mtgTablet_list.do}
+    # MtgrmTabletController.isValidReferer()는 "(레퍼러)" 패턴을 검사
+    referer: ${BACKEND_REFERER:http://localhost:8081/your-backend-path}
     connect-timeout: 5s
     read-timeout: 15s
 
@@ -289,13 +289,8 @@ public List<Reservation> listMyReservations(...) {
 
 | 도구 이름 | 역할 | 매핑 백엔드 endpoint | 종류 |
 |---|---|---|---|
-| `list_offices` | 사무실 목록 조회 | `/com/smartofc/mtgTablet/selectOffmList.do` | read |
-| `list_meeting_rooms` | 회의실 목록 조회 | `/com/smartofc/mtgTablet/selectMtgRmList.do` | read |
-| `check_availability` | 빈 회의실 조회 | `/com/smartofc/mtgTablet/selectMtgRmList.do` (whereType=available) | read |
-| `list_reservations` | 예약 목록 조회 | `/com/smartofc/mtgTabletResve/selectResveList.do` | read |
-| `search_employees` | 직원 검색 | `/com/smartofc/mtgTabletResve/selectEmplyrList.do` | read |
-| `create_reservation` | 예약 등록 | `/com/smartofc/mtgTabletResve/insert.do` | **write (확인 필수)** |
-| `cancel_reservation` | 예약 취소 | `/com/smartofc/mtgTabletResve/updateSttus.do` (sttDiv=resveCancel) | **write (확인 필수)** |
+---
+보안상의 이유로 API 명세는 제거함.
 
 ### 5.2 도구별 어노테이션 예시
 
@@ -442,7 +437,7 @@ public CancelReservationResult cancelReservation(
 ### 6.1 공통 사항
 
 - **base URL**: 기존 시스템 호스트 (application.yml의 `backend.api.base-url`)
-- **referer 헤더**: 모든 요청에 `backend.api.referer` 값 첨부 (`MtgrmTabletController.isValidReferer()` 통과용. 정규식 `.*/com/smartofc/mtgTablet.*\.do(?:\?.*)?$`)
+- **referer 헤더**: 모든 요청에 `backend.api.referer` 값 첨부 (`MtgrmTabletController.isValidReferer()` 통과용. 정규식 사용)
 - **메서드**: 백엔드는 GET/POST 모두 허용 (`method = {RequestMethod.GET, RequestMethod.POST}`). POST + form-urlencoded 권장
 - **인코딩**: UTF-8. 한국어 회의 제목 등 한글 파라미터 처리 주의
 - **응답 포맷**: JSON
@@ -1143,21 +1138,6 @@ Claude Desktop에서 다음 시나리오 모두 통과:
 - [MCP Specification](https://modelcontextprotocol.io/specification/)
 - [MCP Java SDK](https://github.com/modelcontextprotocol/java-sdk)
 
-### 13.2 본 프로젝트 관련 파일
-
-기존 예약시스템 (`E:\_JavaDev\workspace\espora-min-ps-ofc\`):
-
-- **태블릿 컨트롤러**: `src\main\java\biz\com\product\smartofc\web\MtgrmTabletController.java` (referer 검증 + forward)
-- **본 예약 컨트롤러**: `src\main\java\biz\com\product\smartofc\web\MtgrmResveController.java` (실제 비즈니스 로직)
-- **본 회의실 컨트롤러**: `src\main\java\biz\com\product\smartofc\web\MtgrmMngrController.java` (회의실 조회)
-- **사무실 컨트롤러**: `src\main\java\biz\com\product\smartofc\web\OffmMngrController.java`
-- **예약 Mapper**: `src\main\resources\egovframework\mapper\biz\com\product\smartofc\MtgrmResve_maria.xml`
-- **회의실 Mapper**: `src\main\resources\egovframework\mapper\biz\com\product\smartofc\MtgrmMngr_maria.xml` (whereType=available 분기 포함)
-- **사무실 Mapper**: `src\main\resources\egovframework\mapper\biz\com\product\smartofc\OffmMngr_maria.xml`
-- **태블릿 JS**: `src\main\webapp\js\biz\com\product\smartofc\mtgTablet_inqire.js`, `mtgUsrTablet_list.js` (실제 호출 파라미터 참고)
-- **직원 검색 JSP**: `src\main\webapp\WEB-INF\jsp\biz\com\customize\hr\user\comtnemplyrinfo_list.jsp` (검색 파라미터 키 참고)
-- **DB 스키마**: `database\espora_DB_maria.sql`
-- **보안 감사 보고서**: `security-audit-report.md`
 
 ---
 
@@ -1165,9 +1145,9 @@ Claude Desktop에서 다음 시나리오 모두 통과:
 
 이 문서를 받은 coder AI agent는 다음 순서로 진행한다:
 
-1. ☐ `E:\_JavaDev\workspace\espora-min-ps-ofc\` 디렉토리 구조 파악
+1. ☐ 기존프로젝트 디렉토리 구조 파악
 2. ☐ 본 문서 섹션 6의 API 명세를 기준으로 DTO 클래스 작성. 모호한 부분은 mapper XML / JS 파일 추가 분석으로 확정
-3. ☐ DB 스키마(`database\espora_DB_maria.sql`)에서 회의실/예약/직원 테이블 구조 확인 (T_MTGRM_RESVE, T_MTGRM_MNGR, T_OFFM_MNGR, COMTNEMPLYRINFO)
+3. ☐ DB 스키마에서 회의실/예약/직원 테이블 구조 확인
 4. ☐ 새 프로젝트 디렉토리 생성 (예: `E:\_JavaDev\workspace\meeting-room-mcp\`)
 5. ☐ Phase 1 진행: 스켈레톤 + `list_offices` 단일 도구
 6. ☐ MCP Inspector로 1차 검증 + 백엔드 응답이 본 문서 명세와 일치하는지 확인
@@ -1190,3 +1170,4 @@ Claude Desktop에서 다음 시나리오 모두 통과:
 |---|---|---|
 | 2026-05-19 | 초안 작성 | Wan & Claude |
 | 2026-05-19 | 섹션 6 백엔드 API 명세 상세화 (코드 분석 결과 반영) | Claude |
+| 2026-10-07 | 보안상의 이유로 일부 내용 삭제 | Wan |
